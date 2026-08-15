@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fatigueppg"
+version = "1.0.0"
+description = "Fatigue estimation from the dicrotic-peak position in PPG signals (Chen et al., Mathematics 2023, 11, 3580)"
+readme = "README.md"
+requires-python = ">=3.9"
+# license: to be decided by the group; add `license = { file = "LICENSE" }` here
+# once the LICENSE file lands.
+keywords = ["ppg", "photoplethysmography", "fatigue", "hrv", "dicrotic notch",
+            "signal processing", "biomedical"]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+dependencies = [
+    "numpy>=1.23",
+    "scipy>=1.9",
+    "pandas>=1.5",
+    "matplotlib>=3.6",
+    "openpyxl>=3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+fatigue-selfcheck = "fatigueppg.selfcheck:main"
+fatigue-infer = "fatigueppg.infer:main"
+fatigue-extract = "fatigueppg.extract:main"
+fatigue-train = "fatigueppg.train:main"
+fatigue-data = "fatigueppg.fetch:main"
+
+[tool.setuptools]
+packages = ["fatigueppg"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

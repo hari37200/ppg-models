@@ -1,0 +1,15 @@
+{
+  "a": 3.1,
+  "b": 0.6,
+  "feature": "fatigue_index",
+  "zero_frac": 0.5,
+  "threshold": 6.0,
+  "target": "subjective_fatigue_state",
+  "name": "paper-eq9",
+  "provenance": "Chen et al., Mathematics 2023, 11, 3580, Equation (9); fitted on 16 healthy adults aged 22-24 measured with a COMGO device against the BFI-Taiwan form",
+  "metrics": {
+    "r": 0.907,
+    "n": 16
+  },
+  "schema": 1
+}

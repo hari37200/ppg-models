@@ -1,0 +1,9 @@
+# Everything the package needs. Pure CPU -- there is no model to train on a GPU.
+numpy>=1.23
+scipy>=1.9
+pandas>=1.5
+matplotlib>=3.6
+
+# Only used to read the PPG-BP spreadsheet and FatigueSet's survey workbooks.
+# Harmless to keep; drop it if you never touch those corpora.
+openpyxl>=3.0
