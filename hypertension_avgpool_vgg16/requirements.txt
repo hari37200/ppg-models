@@ -1,0 +1,19 @@
+# Core scientific stack (already present on Colab / Kaggle)
+numpy>=1.23
+scipy>=1.9
+pandas>=1.5
+scikit-learn>=1.1          # StratifiedGroupKFold needs >=0.24
+openpyxl>=3.0              # reading "PPG-BP dataset.xlsx"
+joblib>=1.2                # persisting the fitted model (fit_model/predict)
+matplotlib>=3.5
+tqdm>=4.64
+
+# Deep learning.
+# NOTE: do NOT pip-install torch on Colab/Kaggle -- it is preinstalled with the
+# correct CUDA build and reinstalling will break the GPU runtime.
+# Uncomment only for a local CPU install:
+# torch>=2.0
+# torchvision>=0.15
+
+# Optional: gradient-boosting baseline on handcrafted morphology features
+lightgbm>=3.3

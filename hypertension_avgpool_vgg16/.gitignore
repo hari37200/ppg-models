@@ -1,0 +1,24 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# the dataset -- 1.5 MB, but fetched by a documented command, never committed
+data/
+
+# training output and reports
+runs/
+
+# fitted models. `python -m hyperppg.fit_model` rebuilds one in about a minute,
+# so this is a build artefact. Commit it deliberately if you want the repo to
+# be clone-and-predict without the dataset.
+models/*.joblib
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
