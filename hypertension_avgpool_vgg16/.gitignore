@@ -6,11 +6,13 @@ __pycache__/
 venv/
 .pytest_cache/
 
-# the dataset -- 1.5 MB, but fetched by a documented command, never committed
-data/
+# The dataset -- 1.5 MB, fetched by a documented command, never committed.
+# Leading slash matters: a bare `data/` would also match the SOURCE package
+# hyperppg/data/ and silently drop nine files from every commit.
+/data/
 
 # training output and reports
-runs/
+/runs/
 
 # fitted models. `python -m hyperppg.fit_model` rebuilds one in about a minute,
 # so this is a build artefact. Commit it deliberately if you want the repo to

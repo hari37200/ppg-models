@@ -1,0 +1,21 @@
+# Repository-wide. Each project carries its own .gitignore for the
+# artefacts only it produces.
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# Datasets and run output at the repository root only. Anchored with a leading
+# slash: a bare `data/` also matches source packages such as hyperppg/data/.
+/data/
+/runs/
+*.zip
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
