@@ -1,0 +1,26 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# The dataset -- 1.5 MB, fetched by a documented command, never committed.
+# Leading slash matters: a bare `data/` would also match the SOURCE package
+# hyperppg/data/ and silently drop nine files from every commit.
+/data/
+
+# training output and reports
+/runs/
+
+# fitted models. `python -m hyperppg.fit_model` rebuilds one in about a minute,
+# so this is a build artefact. Commit it deliberately if you want the repo to
+# be clone-and-predict without the dataset.
+models/*.joblib
+
+# editors / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
