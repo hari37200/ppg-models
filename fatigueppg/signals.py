@@ -83,11 +83,29 @@ def _match(columns, names, min_substring=3):
 def _fs_from_time(t, notes):
     """Sampling rate from a time column, guessing its unit."""
     t = np.asarray(t, dtype=float)
+    t = t[np.isfinite(t)]
     d = np.diff(t)
-    d = d[np.isfinite(d) & (d > 0)]
-    if d.size < 2:
+    pos = d[d > 0]
+    if pos.size < 2:
         return None
-    fs = 1.0 / float(np.median(d))
+    fs = 1.0 / float(np.median(pos))
+
+    # A time column rounded for display makes the median step a lie. PhysioNet's
+    # BIDMC CSVs write two decimals, so a 0.008 s step is stored as 0.01 and
+    # every sixth timestamp repeats -- the median says 100 Hz where the truth is
+    # 125. The total span survives the rounding, so prefer it, but only when
+    # repeated timestamps prove rounding is what happened: a recording with a
+    # genuine gap has no ties, and there the median is the honest answer.
+    ties = int((d == 0).sum())
+    span = float(t[-1] - t[0]) if t.size > 1 else 0.0
+    if ties and span > 0 and not (d < 0).any():
+        fs_span = (t.size - 1) / span
+        if abs(fs_span - fs) > 0.01 * fs_span:
+            notes.append(f"time column has {ties} repeated timestamps (rounded "
+                         f"for display); rate read from the total span "
+                         f"({fs_span:g} Hz), not the median step ({fs:g} Hz)")
+            fs = fs_span
+
     if fs < 5.0:                      # the column was almost certainly in ms
         notes.append(f"time column looks like milliseconds; fs {fs:g} -> {fs*1000:g} Hz")
         fs *= 1000.0

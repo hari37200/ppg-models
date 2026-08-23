@@ -105,6 +105,48 @@ Options: `--model` (a calibration model to apply), `--zero-frac`, `--json`,
 `--csv`, `--plot`, `--quiet`. `--plot` writes a one-page report: the waveform
 with fiducials, how one cycle's index is read, and the index over time.
 
+### Running it on your own signal
+
+Nothing here is tied to this machine or this folder. Point `--input` at your file
+with whatever path your shell uses.
+
+```bash
+# Linux / macOS
+python -m fatigueppg.infer --input ~/recordings/session01.csv --plot ~/report.png
+
+# Windows PowerShell
+python -m fatigueppg.infer --input C:\Users\you\recordings\session01.csv --plot C:\Users\you\report.png
+
+# relative to wherever you are
+python -m fatigueppg.infer --input ../data/session01.csv
+```
+
+Paths may be absolute or relative. The one requirement is that `python -m
+fatigueppg.*` runs from the `fatigue-ppg/` folder, because that is where the
+`fatigueppg` package sits. Two ways to stop caring:
+
+```bash
+pip install -e .                                   # from fatigue-ppg/, once
+fatigue-infer --input /any/path/recording.csv      # now works from any directory
+```
+
+```bash
+export PYTHONPATH=/path/to/ppg-models/fatigue-ppg  # $env:PYTHONPATH in PowerShell
+python -m fatigueppg.infer --input /any/path/recording.csv
+```
+
+**What your file needs.** One PPG channel and at least ~5 seconds; 60 s or more if
+you want NLF/NHF to mean anything. A time column is convenient but optional — pass
+`--fs` instead. Everything else (which column, which orientation, whether the clock
+is seconds or milliseconds) is worked out and reported back as notes, so a wrong
+guess shows up in the output rather than in the result.
+
+**On a machine with none of your data yet:**
+
+```bash
+python -m fatigueppg.infer --demo         # synthetic, needs no files at all
+```
+
 ### From Python
 
 ```python

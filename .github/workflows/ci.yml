@@ -1,8 +1,23 @@
-name: tests
+# GitHub only reads workflows from `.github/workflows/` at the REPOSITORY ROOT.
+#
+# If fatigue-ppg is a subdirectory of ppg-models, move this file to
+# ppg-models/.github/workflows/ci.yml. It works from either location: the
+# "locate" step below finds the package whether it sits at the repo root or one
+# level down.
+
+name: fatigue-ppg
 
 on:
   push:
     branches: [main, master]
+    paths:
+      - "fatigue-ppg/**"
+      - "fatigueppg/**"
+      - "tests/**"
+      - "examples/**"
+      - "requirements.txt"
+      - "pyproject.toml"
+      - ".github/workflows/ci.yml"
   pull_request:
   workflow_dispatch:
 
@@ -19,8 +34,24 @@ jobs:
           - os: windows-latest
             python-version: "3.11"
 
+    env:
+      MPLBACKEND: Agg
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Locate the package
+        id: loc
+        shell: bash
+        run: |
+          if [ -f fatigueppg/selfcheck.py ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          elif [ -f fatigue-ppg/fatigueppg/selfcheck.py ]; then
+            echo "dir=fatigue-ppg" >> "$GITHUB_OUTPUT"
+          else
+            echo "cannot find the fatigueppg package" >&2
+            exit 1
+          fi
 
       - uses: actions/setup-python@v5
         with:
@@ -28,6 +59,8 @@ jobs:
           cache: pip
 
       - name: Install
+        shell: bash
+        working-directory: ${{ steps.loc.outputs.dir }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -36,18 +69,18 @@ jobs:
       - name: Self-check
         # Validates every stage of the paper's method against synthetic ground
         # truth. If this fails, nothing downstream is worth running.
-        env:
-          MPLBACKEND: Agg
+        shell: bash
+        working-directory: ${{ steps.loc.outputs.dir }}
         run: python -m fatigueppg.selfcheck
 
       - name: Tests
-        env:
-          MPLBACKEND: Agg
+        shell: bash
+        working-directory: ${{ steps.loc.outputs.dir }}
         run: python -m pytest -q
 
       - name: Inference on the bundled example
-        env:
-          MPLBACKEND: Agg
+        shell: bash
+        working-directory: ${{ steps.loc.outputs.dir }}
         run: |
           python -m fatigueppg.infer --input examples/demo_ppg_200hz.csv
           python -m fatigueppg.infer --demo
@@ -55,15 +88,29 @@ jobs:
   quickstart:
     # The whole extract -> train -> infer path, on synthetic data.
     runs-on: ubuntu-latest
+    env:
+      MPLBACKEND: Agg
     steps:
       - uses: actions/checkout@v4
+
+      - name: Locate the package
+        id: loc
+        shell: bash
+        run: |
+          if [ -f fatigueppg/selfcheck.py ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+          else
+            echo "dir=fatigue-ppg" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
-      - run: |
+
+      - shell: bash
+        working-directory: ${{ steps.loc.outputs.dir }}
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - env:
-          MPLBACKEND: Agg
-        run: bash scripts/quickstart.sh
+          bash scripts/quickstart.sh

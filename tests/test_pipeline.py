@@ -186,3 +186,31 @@ def test_cli_infer_bundled_example():
     assert "fatigue index" in out.stdout
     # the rate and the column are both inferred from the file itself
     assert "200 Hz" in out.stdout
+
+
+def test_rounded_time_column_does_not_fool_the_rate(tmp_path):
+    """PhysioNet's BIDMC CSVs round the clock to two decimals, so a 125 Hz
+    record stores 0.01 where the step is really 0.008 and every sixth
+    timestamp repeats. The median step then reads 100 Hz -- a 25% error on
+    every timing feature in the paper. The total span survives the rounding."""
+    fs, n = 125.0, 2000
+    t = np.round(np.arange(n) / fs, 2)          # what BIDMC actually writes
+    assert np.median(np.diff(t)) == pytest.approx(0.01)   # the trap
+    csv = tmp_path / "rounded.csv"
+    pd.DataFrame({"time": t, "ppg": synth_ppg(n / fs, fs, hr=70)[0]}).to_csv(csv, index=False)
+
+    rec = load_signal(csv)
+    # not exact: the last timestamp is rounded too, so the span is off by ~0.01%
+    assert rec.fs == pytest.approx(fs, rel=1e-3)
+    assert any("repeated timestamps" in note for note in rec.notes)
+
+
+def test_a_genuine_gap_still_uses_the_median_step(tmp_path):
+    """The span shortcut must not fire on a recording with a real dropout:
+    there are no repeated timestamps there, and the median step is honest."""
+    fs = 100.0
+    t = np.concatenate([np.arange(500) / fs, 30.0 + np.arange(500) / fs])
+    csv = tmp_path / "gap.csv"
+    pd.DataFrame({"time": t, "ppg": np.random.default_rng(0).normal(size=t.size)}
+                 ).to_csv(csv, index=False)
+    assert load_signal(csv).fs == pytest.approx(fs, rel=1e-6)
